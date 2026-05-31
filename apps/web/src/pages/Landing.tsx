@@ -261,7 +261,7 @@ const CAPABILITIES = [
 function CapabilityRow({ n, title, line, tags }: typeof CAPABILITIES[number]) {
   return (
     <div className="nx-glass" style={{ padding: '28px 32px', display: 'grid', gridTemplateColumns: '120px 1fr auto', gap: 32, alignItems: 'center' }}>
-      <div style={{ fontFamily: 'var(--f-mono)', fontSize: 12, letter: '0.24em', color: 'var(--cyan)', letterSpacing: '0.24em' }}>// {n}</div>
+      <div style={{ fontFamily: 'var(--f-mono)', fontSize: 12, color: 'var(--cyan)', letterSpacing: '0.24em' }}>// {n}</div>
       <div>
         <div className="nx-feat-title" style={{ fontSize: 22 }}>{title}</div>
         <p className="nx-feat-body" style={{ marginTop: 6 }}>{line}</p>

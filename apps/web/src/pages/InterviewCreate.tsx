@@ -24,7 +24,6 @@ import {
   ThunderboltOutlined,
   UploadOutlined,
   RobotOutlined,
-  ClockCircleOutlined,
 } from '@ant-design/icons';
 import type { UploadFile, UploadProps } from 'antd';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -56,7 +55,7 @@ import TimeBadge from '../components/TimeBadge';
 import BudgetMeter from '../components/BudgetMeter';
 import PageHeader from '../components/PageHeader';
 
-const { Title, Paragraph, Text } = Typography;
+const { Text } = Typography;
 
 interface FormValues {
   candidate_email: string;

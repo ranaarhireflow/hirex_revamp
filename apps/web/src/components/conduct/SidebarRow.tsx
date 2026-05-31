@@ -53,7 +53,6 @@ export default function SidebarRow({ question, index, active, onClick }: Props) 
       <span style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
         <span
           style={{
-            display: 'block',
             fontSize: 13,
             fontWeight: active ? 500 : 400,
             color: 'var(--hx-text-2)',

@@ -20,6 +20,7 @@ export interface QuestionTemplateInput {
   question_type: QuestionType;
   difficulty?: Difficulty | string;
   experience_levels?: string[];
+  time_minutes?: number;
   rubric?: Record<string, unknown> | null;
 }
 
