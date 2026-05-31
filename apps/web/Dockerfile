@@ -32,23 +32,21 @@ RUN pnpm build
 # ───────────────────────────────────────────────────────────────
 FROM nginx:1.27-alpine AS serve
 
-# Strip default site, drop in our SPA-aware config as a TEMPLATE so the
-# nginx:alpine image runs envsubst on it at boot — `${PORT}` becomes the
-# real port number from the env, defaulting to 80 if nothing is set.
-#
-# Also override the top-level nginx.conf so worker_processes is pinned to 1
-# (Railway containers can see 44+ host CPUs and would spawn one worker each,
-# OOM-killing the container on the default 512 MB service).
+# Configuration:
+# - nginx-main.conf overrides /etc/nginx/nginx.conf so worker_processes=1
+#   (Railway containers see the host's 44+ CPUs and would spawn one worker
+#   each, OOM-killing the 512 MB service).
+# - nginx.conf is copied directly to conf.d (NOT a template). It hardcodes
+#   listen 80 + listen [::]:80 so we serve on the port Railway expects
+#   regardless of any $PORT env injection.
 RUN rm -rf /usr/share/nginx/html/* /etc/nginx/conf.d/default.conf
 COPY nginx-main.conf /etc/nginx/nginx.conf
-COPY nginx.conf /etc/nginx/templates/default.conf.template
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Local default — overridden by Railway / Fly / Cloud Run at runtime.
-ENV PORT=80
 EXPOSE 80
 
 HEALTHCHECK --interval=30s --timeout=4s --start-period=5s --retries=3 \
-  CMD sh -c "wget -qO- http://localhost:${PORT:-80}/healthz > /dev/null || exit 1"
+  CMD wget -qO- http://127.0.0.1/healthz > /dev/null 2>&1 || exit 1
 
 CMD ["nginx", "-g", "daemon off;"]
