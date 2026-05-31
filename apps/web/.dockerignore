@@ -1,0 +1,25 @@
+node_modules
+dist
+.cache
+.next
+.turbo
+out
+*.tsbuildinfo
+
+# Local state
+.env
+.env.local
+.env.*.local
+
+# Editor / OS
+.DS_Store
+.idea
+.vscode
+
+# Git
+.git
+.gitignore
+
+# Docker artefacts
+Dockerfile
+.dockerignore

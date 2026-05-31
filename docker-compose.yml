@@ -1,0 +1,80 @@
+# Local Hirex stack — `docker compose up --build`
+#
+# Brings up: api (FastAPI on :5050), web (nginx-served Vite build on :3000),
+# and an optional local Postgres if you don't want to point at Railway.
+#
+# Quickstart:
+#   1. cp .env.example .env  (fill in OPENROUTER_API_KEY + DATABASE_URL)
+#   2. docker compose up --build
+#   3. docker compose exec api python scripts/init_db.py
+#   4. docker compose exec api python scripts/seed.py
+#   5. open http://localhost:3000
+
+services:
+  # ────────── Backend ──────────
+  api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile
+    container_name: hirex-api
+    restart: unless-stopped
+    env_file:
+      - ./.env
+    environment:
+      PORT: "5050"
+      # If you switch to the bundled postgres (uncomment `db` below),
+      # change DATABASE_URL in .env to:
+      # postgresql://hirex:hirex@db:5432/hirex
+    ports:
+      - "5050:5050"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:5050/healthz"]
+      interval: 30s
+      timeout: 4s
+      start_period: 12s
+      retries: 3
+    # depends_on:
+    #   db:
+    #     condition: service_healthy
+
+  # ────────── Frontend ──────────
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+      args:
+        # Point the built bundle at the api service running in the same compose net.
+        # For browser access on the host, this also works because we publish :5050
+        # under the same hostname.
+        VITE_API_URL: http://localhost:5050
+    container_name: hirex-web
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - api
+
+  # ────────── (Optional) bundled Postgres ──────────
+  # Uncomment if you want a fully-local stack instead of using Railway.
+  # Also set DATABASE_URL in .env to: postgresql://hirex:hirex@db:5432/hirex
+  #
+  # db:
+  #   image: pgvector/pgvector:pg16
+  #   container_name: hirex-db
+  #   restart: unless-stopped
+  #   environment:
+  #     POSTGRES_USER: hirex
+  #     POSTGRES_PASSWORD: hirex
+  #     POSTGRES_DB: hirex
+  #   volumes:
+  #     - hirex-pgdata:/var/lib/postgresql/data
+  #   ports:
+  #     - "5432:5432"
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U hirex -d hirex"]
+  #     interval: 10s
+  #     timeout: 4s
+  #     retries: 5
+
+# volumes:
+#   hirex-pgdata:

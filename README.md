@@ -72,6 +72,24 @@ Optional: Clerk auth keys (falls back to dev mode), R2 storage (falls back to lo
 
 ---
 
+## Docker
+
+A full local stack via `docker compose`:
+
+```bash
+cp .env.example .env       # fill in OPENROUTER_API_KEY + DATABASE_URL
+docker compose up --build  # api on :5050, web on :3000
+docker compose exec api python scripts/init_db.py
+docker compose exec api python scripts/seed.py
+open http://localhost:3000
+```
+
+To run a fully self-contained stack (no Railway DB), uncomment the `db` service in `docker-compose.yml` and point `DATABASE_URL` at `postgresql://hirex:hirex@db:5432/hirex`. The bundled image is `pgvector/pgvector:pg16` so the `vector` extension is already available.
+
+Individual Dockerfiles:
+- **`apps/api/Dockerfile`** — Python 3.11-slim, non-root user, `$PORT`-aware so it deploys on Railway / Fly / Cloud Run as-is
+- **`apps/web/Dockerfile`** — multi-stage (Node + pnpm → nginx:alpine), SPA fallback in `nginx.conf`, accepts `VITE_API_URL` as a `--build-arg`
+
 ## Deploying
 
 ### Frontend → Vercel

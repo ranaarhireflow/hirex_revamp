@@ -1,0 +1,29 @@
+.venv
+venv
+__pycache__
+*.py[cod]
+*$py.class
+.pytest_cache
+.mypy_cache
+.ruff_cache
+*.egg-info
+
+# Local state — never bake into the image
+.env
+.env.local
+.env.*.local
+uploads/
+*.log
+
+# Editor / OS
+.DS_Store
+.idea
+.vscode
+
+# Git
+.git
+.gitignore
+
+# Docker artefacts
+Dockerfile
+.dockerignore
