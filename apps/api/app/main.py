@@ -14,9 +14,19 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Hirex API", version="0.0.1", lifespan=lifespan)
 
+def _allow_origins() -> list[str]:
+    """NEXT_PUBLIC_APP_URL can be a single URL or a comma-separated list."""
+    raw = settings.next_public_app_url or ""
+    return [o.strip().rstrip("/") for o in raw.split(",") if o.strip()]
+
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[settings.next_public_app_url],
+    allow_origins=_allow_origins(),
+    # Catch Railway / Vercel preview URLs (e.g. *.up.railway.app) so that
+    # branch deploys and renamed services keep working without a backend
+    # env-var change. Production URLs should still go in NEXT_PUBLIC_APP_URL.
+    allow_origin_regex=r"^https://([a-z0-9-]+\.)*(up\.railway\.app|vercel\.app)$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
