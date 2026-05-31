@@ -394,6 +394,10 @@ export default function InterviewCreate() {
           items={[
             {
               key: 'advanced',
+              // forceRender keeps the Form.Items mounted even when the panel
+              // is collapsed — otherwise their values never register with
+              // the form and submit as 'undefined' (caused 422 on role_variant).
+              forceRender: true,
               label: <span style={{ fontWeight: 500, color: 'var(--hx-text-2)' }}>Advanced</span>,
               children: (
                 <Card>

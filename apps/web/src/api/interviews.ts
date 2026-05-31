@@ -37,21 +37,33 @@ export interface CreateInterviewInput {
   resume?: File;
 }
 
+/** Append to FormData only if the value is a real, non-empty string/number.
+ *  Catches `undefined`, `null`, NaN — all of which become the literal string
+ *  "undefined"/"null" on FormData.append, which then fails backend validation. */
+function appendIfReal(fd: FormData, key: string, value: unknown): void {
+  if (value === undefined || value === null) return;
+  if (typeof value === 'string' && value.length === 0) return;
+  if (typeof value === 'number' && Number.isNaN(value)) return;
+  fd.append(key, String(value));
+}
+
 export async function createInterview(input: CreateInterviewInput): Promise<Interview> {
   const fd = new FormData();
   fd.append('candidate_email', input.candidate_email);
-  if (input.candidate_name) fd.append('candidate_name', input.candidate_name);
+  appendIfReal(fd, 'candidate_name', input.candidate_name);
   fd.append('role_type', input.role_type);
-  fd.append('role_variant', input.role_variant);
+  // Safe defaults so a collapsed-Advanced section that didn't mount its
+  // Form.Items can never send 'undefined' to the backend.
+  fd.append('role_variant', input.role_variant || 'marquee');
   fd.append('jd_text', input.jd_text);
   fd.append('current_round', input.current_round);
   fd.append('duration_limit_seconds', String(input.duration_limit_seconds));
   fd.append('question_limit', String(input.question_limit));
-  if (input.custom_instructions) fd.append('custom_instructions', input.custom_instructions);
-  fd.append('tone', input.tone);
-  fd.append('language', input.language);
-  fd.append('experience_level', input.experience_level);
-  if (input.years_experience != null) fd.append('years_experience', String(input.years_experience));
+  appendIfReal(fd, 'custom_instructions', input.custom_instructions);
+  fd.append('tone', input.tone || 'professional');
+  fd.append('language', input.language || 'english');
+  fd.append('experience_level', input.experience_level || 'mid');
+  appendIfReal(fd, 'years_experience', input.years_experience);
   fd.append('template_ids_json', JSON.stringify(input.template_ids));
   fd.append('custom_questions_json', JSON.stringify(input.custom_questions));
   if (input.resume) fd.append('resume', input.resume);
