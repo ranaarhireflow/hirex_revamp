@@ -1,8 +1,26 @@
 from pathlib import Path
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-# Repo root is three levels up from apps/api/app/config.py
-ROOT = Path(__file__).resolve().parents[3]
+_HERE = Path(__file__).resolve()
+
+
+def _find_root() -> Path:
+    """Locate the directory that holds the `.env` file when running locally
+    out of the monorepo (~/hirex/apps/api/app/config.py → ~/hirex).
+
+    In a Docker container the file lives at /app/app/config.py and there's
+    no .env at all (env vars come from the PaaS), so we just fall back to
+    the parent of the `app` package — `/app`.
+    """
+    for parent in _HERE.parents:
+        if (parent / ".env").exists() or (parent / ".git").exists():
+            return parent
+    # Defensive fallback: parent of the app package.
+    return _HERE.parents[1] if len(_HERE.parents) > 1 else Path("/app")
+
+
+ROOT = _find_root()
+_ENV_FILE = ROOT / ".env"
 
 
 class Settings(BaseSettings):
@@ -32,8 +50,11 @@ class Settings(BaseSettings):
     redis_url: str = ""
     sentry_dsn: str = ""
 
+    # Only point pydantic-settings at the .env file when it actually exists.
+    # In production (Railway / Fly / Cloud Run) env vars come from the
+    # platform, not a file, so env_file=None is the right call.
     model_config = SettingsConfigDict(
-        env_file=str(ROOT / ".env"),
+        env_file=str(_ENV_FILE) if _ENV_FILE.exists() else None,
         env_file_encoding="utf-8",
         extra="ignore",
         case_sensitive=False,
