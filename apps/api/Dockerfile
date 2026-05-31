@@ -23,9 +23,11 @@ RUN apt-get update \
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 
-# App code
+# App code + entrypoint
 COPY app ./app
 COPY scripts ./scripts
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 # Non-root user for the runtime
 RUN groupadd -r hirex && useradd --no-log-init -r -g hirex hirex \
@@ -38,9 +40,8 @@ EXPOSE 5050
 
 # Quick health probe — assumes /healthz route in app.main
 HEALTHCHECK --interval=30s --timeout=4s --start-period=10s --retries=3 \
-  CMD curl -fsS "http://localhost:${PORT}/healthz" || exit 1
+  CMD ["sh", "-c", "curl -fsS \"http://localhost:${PORT}/healthz\" || exit 1"]
 
-# Bind to all interfaces, use the platform's $PORT, single worker.
-# Shell form (vs JSON exec form) is required so $PORT actually expands —
-# Railway / Fly / Cloud Run inject the port at container start.
-CMD uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-5050}
+# Single, unambiguous entrypoint script handles $PORT expansion + exec.
+# This avoids Railway/PaaS quirks with shell-form vs JSON-exec CMD.
+ENTRYPOINT ["/entrypoint.sh"]
