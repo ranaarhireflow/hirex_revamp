@@ -35,7 +35,12 @@ FROM nginx:1.27-alpine AS serve
 # Strip default site, drop in our SPA-aware config as a TEMPLATE so the
 # nginx:alpine image runs envsubst on it at boot — `${PORT}` becomes the
 # real port number from the env, defaulting to 80 if nothing is set.
+#
+# Also override the top-level nginx.conf so worker_processes is pinned to 1
+# (Railway containers can see 44+ host CPUs and would spawn one worker each,
+# OOM-killing the container on the default 512 MB service).
 RUN rm -rf /usr/share/nginx/html/* /etc/nginx/conf.d/default.conf
+COPY nginx-main.conf /etc/nginx/nginx.conf
 COPY nginx.conf /etc/nginx/templates/default.conf.template
 COPY --from=build /app/dist /usr/share/nginx/html
 
