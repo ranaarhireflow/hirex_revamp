@@ -1,0 +1,112 @@
+/* Hirex design tokens — slate-led with a single blue accent, Linear/Stripe/Notion-grade. */
+
+:root {
+  /* Surface */
+  --hx-bg:           #F8FAFC; /* slate-50  — app shell */
+  --hx-surface:      #FFFFFF; /* white     — content surfaces */
+  --hx-surface-2:    #F1F5F9; /* slate-100 — quiet surfaces */
+  --hx-surface-3:    #EAEFF3;
+
+  /* Borders */
+  --hx-border:       #E2E8F0; /* slate-200 */
+  --hx-border-soft:  #F1F5F9; /* slate-100 */
+
+  /* Text */
+  --hx-text:         #0F172A; /* slate-900 */
+  --hx-text-2:       #334155; /* slate-700 */
+  --hx-text-3:       #64748B; /* slate-500 */
+  --hx-text-4:       #94A3B8; /* slate-400 */
+
+  /* Accent */
+  --hx-accent:       #2563EB; /* blue-600 */
+  --hx-accent-bg:    #EFF6FF; /* blue-50 */
+  --hx-accent-bg-2:  #DBEAFE; /* blue-100 */
+
+  /* Semantic */
+  --hx-success:      #16A34A;
+  --hx-success-bg:   #ECFDF5;
+  --hx-warn:         #D97706;
+  --hx-warn-bg:      #FFFBEB;
+  --hx-danger:       #DC2626;
+  --hx-danger-bg:    #FEF2F2;
+
+  /* AI / generative accent */
+  --hx-ai:           #7C3AED; /* violet-600 */
+  --hx-ai-bg:        #F5F3FF; /* violet-50 */
+
+  /* Shadow scale (very restrained) */
+  --hx-shadow-sm:    0 1px 2px rgba(15, 23, 42, 0.04);
+  --hx-shadow:       0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --hx-shadow-lg:    0 8px 24px rgba(15, 23, 42, 0.08), 0 2px 4px rgba(15, 23, 42, 0.04);
+
+  /* Radius */
+  --hx-radius-xs: 4px;
+  --hx-radius-sm: 6px;
+  --hx-radius:    8px;
+  --hx-radius-lg: 12px;
+
+  /* Typography */
+  --hx-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --hx-font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Spacing rhythm — 4pt grid */
+  --hx-space-1: 4px;
+  --hx-space-2: 8px;
+  --hx-space-3: 12px;
+  --hx-space-4: 16px;
+  --hx-space-5: 20px;
+  --hx-space-6: 24px;
+  --hx-space-8: 32px;
+}
+
+html, body, #root {
+  background: var(--hx-bg);
+  color: var(--hx-text);
+  font-family: var(--hx-font-sans);
+  font-feature-settings: 'cv11', 'ss01', 'ss03'; /* Inter stylistic sets — modern feel */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.003em;
+}
+
+/* Section label — small caps, used to chunk the conduct page */
+.hx-section-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--hx-text-3);
+  line-height: 1;
+}
+
+/* Subtle horizontal divider */
+.hx-divider {
+  border: 0;
+  border-top: 1px solid var(--hx-border-soft);
+  margin: var(--hx-space-6) 0;
+}
+
+/* Animation primitives */
+@media (prefers-reduced-motion: no-preference) {
+  .hx-fade-in {
+    animation: hxFadeIn 200ms ease-out both;
+  }
+}
+@keyframes hxFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Hover-lift on tappable surfaces */
+.hx-lift {
+  transition: transform 120ms ease-out, box-shadow 120ms ease-out, background-color 120ms ease-out;
+}
+.hx-lift:hover {
+  background-color: var(--hx-surface-2);
+}
+
+/* Tighten AntD's heading defaults */
+h1.ant-typography, h2.ant-typography, h3.ant-typography, h4.ant-typography {
+  letter-spacing: -0.018em;
+  font-weight: 600;
+}
