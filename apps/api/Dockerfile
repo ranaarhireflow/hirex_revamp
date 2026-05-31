@@ -40,6 +40,7 @@ EXPOSE 5050
 HEALTHCHECK --interval=30s --timeout=4s --start-period=10s --retries=3 \
   CMD curl -fsS "http://localhost:${PORT}/healthz" || exit 1
 
-# Bind to all interfaces, use the platform's $PORT, single worker
-# (Railway / Vercel-style platforms scale by replicas, not workers).
-CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-5050}"]
+# Bind to all interfaces, use the platform's $PORT, single worker.
+# Shell form (vs JSON exec form) is required so $PORT actually expands —
+# Railway / Fly / Cloud Run inject the port at container start.
+CMD uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-5050}
