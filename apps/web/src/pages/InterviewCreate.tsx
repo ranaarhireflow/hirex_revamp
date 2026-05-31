@@ -695,10 +695,15 @@ const generateCtaStyle: React.CSSProperties = {
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
-  background: 'linear-gradient(135deg, #EFF6FF 0%, #FFFFFF 100%)',
-  border: '1px solid var(--hx-accent-bg-2)',
-  borderRadius: 10,
-  padding: 16,
+  background:
+    'linear-gradient(135deg, rgba(94, 233, 255, 0.10) 0%, rgba(155, 107, 255, 0.08) 100%)',
+  border: '1px solid rgba(94, 233, 255, 0.28)',
+  borderRadius: 12,
+  padding: '16px 18px',
   gap: 16,
   flexWrap: 'wrap',
+  boxShadow:
+    'inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 12px 40px -12px rgba(94, 233, 255, 0.18)',
+  backdropFilter: 'blur(8px)',
+  WebkitBackdropFilter: 'blur(8px)',
 };
