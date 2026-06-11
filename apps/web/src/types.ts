@@ -154,3 +154,61 @@ export const DIFFICULTY_COLOR: Record<string, string> = {
   medium: 'gold',
   hard: 'red',
 };
+
+// ----------------------------------------------------------------------------
+// Resume screening
+// ----------------------------------------------------------------------------
+
+export type ScreenStatus = 'processing' | 'completed' | 'failed';
+export type CandidateStatus = 'pending' | 'scored' | 'failed';
+export type Verdict = 'strong_match' | 'possible' | 'weak';
+
+export interface ScreenCandidate {
+  id: string;
+  file_name: string;
+  candidate_name: string | null;
+  match_score: number | null;
+  verdict: Verdict | null;
+  summary: string | null;
+  strengths: string[];
+  opportunities: string[];
+  status: CandidateStatus;
+  error: string | null;
+  created_at: string;
+}
+
+export interface ScreenSummary {
+  id: string;
+  title: string;
+  status: ScreenStatus;
+  candidate_count: number;
+  scored_count: number;
+  top_score: number | null;
+  created_at: string;
+}
+
+export interface ScreenDetail extends ScreenSummary {
+  jd_text: string;
+  updated_at: string;
+  candidates: ScreenCandidate[];
+}
+
+export const VERDICT_LABEL: Record<Verdict, string> = {
+  strong_match: 'Strong match',
+  possible: 'Possible',
+  weak: 'Weak',
+};
+
+export const VERDICT_COLOR: Record<Verdict, string> = {
+  strong_match: 'green',
+  possible: 'gold',
+  weak: 'red',
+};
+
+/** Hex colour for a match score, banded to match VERDICT_COLOR. */
+export function scoreColor(score: number | null | undefined): string {
+  if (score == null) return '#8c8c8c';
+  if (score >= 75) return '#52c41a';
+  if (score >= 50) return '#faad14';
+  return '#ff4d4f';
+}

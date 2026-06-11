@@ -11,6 +11,7 @@ interface NavItem {
 const PRIMARY_NAV: NavItem[] = [
   { to: '/recruiter', end: true, label: 'Interviews' },
   { to: '/recruiter/new', label: 'New interview' },
+  { to: '/recruiter/screening', label: 'Resume screening' },
   { to: '/recruiter/questions', label: 'Question bank' },
 ];
 

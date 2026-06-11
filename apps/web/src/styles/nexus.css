@@ -1562,6 +1562,12 @@ body:has(.nexus) {
 }
 .ant-popover-inner-content { color: #e8ecff !important; }
 .ant-popover-arrow::before { background: rgba(6, 6, 26, 0.95) !important; }
+/* Popconfirm sets explicit dark text on its title/description, which doesn't
+   inherit the light .ant-popover-inner-content colour — recolour them for the
+   dark canvas so they're legible. */
+.ant-popconfirm-title,
+.ant-popconfirm-message-text { color: #e8ecff !important; }
+.ant-popconfirm-description { color: rgba(232, 236, 255, 0.7) !important; }
 
 /* ---- Table ---- */
 .nexus-dashboard .ant-table {

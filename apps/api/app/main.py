@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
-from app.routes import conduct, health, interviews, question_templates
+from app.routes import conduct, health, interviews, question_templates, screenings
 
 
 @asynccontextmanager
@@ -36,3 +36,4 @@ app.include_router(health.router)
 app.include_router(interviews.router)
 app.include_router(question_templates.router)
 app.include_router(conduct.router)
+app.include_router(screenings.router)

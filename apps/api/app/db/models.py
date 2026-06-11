@@ -206,6 +206,85 @@ class Report(Base):
     interview: Mapped[Interview] = relationship(back_populates="report")
 
 
+class ScreenStatus(str, enum.Enum):
+    processing = "processing"
+    completed = "completed"
+    failed = "failed"
+
+
+class CandidateStatus(str, enum.Enum):
+    pending = "pending"
+    scored = "scored"
+    failed = "failed"
+
+
+class ResumeScreen(Base):
+    """A resume-screening batch: one JD scored against many uploaded resumes.
+
+    Pre-interview triage. Each uploaded resume (or ZIP entry) becomes a
+    `ScreenCandidate` row that the background scorer fills in with a match %,
+    strengths, and opportunities relative to `jd_text`.
+    """
+
+    __tablename__ = "resume_screens"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    recruiter_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id"), nullable=True
+    )
+    title: Mapped[str] = mapped_column(String, nullable=False)
+    jd_text: Mapped[str] = mapped_column(Text, nullable=False)
+    status: Mapped[ScreenStatus] = mapped_column(
+        SAEnum(ScreenStatus, name="screen_status"),
+        default=ScreenStatus.processing,
+        nullable=False,
+    )
+    candidate_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=_utcnow, onupdate=_utcnow, nullable=False
+    )
+
+    candidates: Mapped[list["ScreenCandidate"]] = relationship(
+        back_populates="screen",
+        cascade="all, delete-orphan",
+        order_by="ScreenCandidate.created_at",
+    )
+
+
+class ScreenCandidate(Base):
+    __tablename__ = "screen_candidates"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    screen_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("resume_screens.id", ondelete="CASCADE"), nullable=False
+    )
+    file_name: Mapped[str] = mapped_column(String, nullable=False)
+    candidate_name: Mapped[str | None] = mapped_column(String)
+    # NOTE: resumes are never persisted. The uploaded file and its extracted
+    # text live only in process memory during scoring; only the derived
+    # assessment below is stored.
+
+    match_score: Mapped[int | None] = mapped_column(Integer)
+    strengths: Mapped[list[str]] = mapped_column(JSONB, default=list, nullable=False)
+    opportunities: Mapped[list[str]] = mapped_column(JSONB, default=list, nullable=False)
+    summary: Mapped[str | None] = mapped_column(Text)
+    # strong_match | possible | weak — derived from match_score, drives the UI pill.
+    verdict: Mapped[str | None] = mapped_column(String)
+
+    status: Mapped[CandidateStatus] = mapped_column(
+        SAEnum(CandidateStatus, name="candidate_status"),
+        default=CandidateStatus.pending,
+        nullable=False,
+    )
+    error: Mapped[str | None] = mapped_column(Text)
+
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow, nullable=False)
+
+    screen: Mapped[ResumeScreen] = relationship(back_populates="candidates")
+
+
 class QuestionTemplate(Base):
     """Reusable question library, owned by recruiters.
 
