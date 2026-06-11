@@ -750,6 +750,14 @@ body:has(.nexus) {
 .nexus-dashboard textarea { cursor: text; }
 
 .nexus-dashboard {
+  /* `.nexus` sets `overflow-x: hidden`, which makes the browser compute
+     `overflow-y` to `auto` — turning the dashboard root into a scroll container.
+     Because it grows to content height (the window is the real scroller), that
+     scroll container never scrolls, so the sticky header/sidebar reference it
+     and never stick. The dashboard doesn't need horizontal clipping, so restore
+     `overflow: visible` to put the viewport back as the scroll root. */
+  overflow: visible;
+
   /* Quiet ambient glow rather than full nebula — preserves focus */
   background:
     radial-gradient(ellipse 100% 60% at 20% 0%, rgba(94, 233, 255, 0.08) 0%, transparent 60%),
